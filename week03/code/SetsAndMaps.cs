@@ -1,5 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Text.Json;
 
+/// <summary>
+/// SetsAndMaps contains solutions for Week03 problems:
+/// FindPairs, SummarizeDegrees, IsAnagram, EarthquakeDailySummary
+/// </summary>
 public static class SetsAndMaps
 {
     /// <summary>
@@ -22,7 +30,34 @@ public static class SetsAndMaps
     public static string[] FindPairs(string[] words)
     {
         // TODO Problem 1 - ADD YOUR CODE HERE
-        return [];
+        HashSet<string> seen = new HashSet<string>();
+        HashSet<string> addedPairs = new HashSet<string>();
+        List<string> result = new List<string>();
+
+        foreach (string word in words)
+        {
+            // Ignore words like "aa"
+            if (word[0] == word[1])
+                continue;
+
+            string reversed = $"{word[1]}{word[0]}";
+
+            if (seen.Contains(reversed))
+            {
+                // Sort alphabetically to avoid duplicates
+                string pair = string.Compare(word, reversed) < 0 ? $"{word} & {reversed}" : $"{reversed} & {word}";
+
+                if (!addedPairs.Contains(pair))
+                {
+                    result.Add(pair);
+                    addedPairs.Add(pair);
+                }
+            }
+
+            seen.Add(word);
+        }
+
+        return result.ToArray();
     }
 
     /// <summary>
@@ -42,7 +77,17 @@ public static class SetsAndMaps
         foreach (var line in File.ReadLines(filename))
         {
             var fields = line.Split(",");
+
             // TODO Problem 2 - ADD YOUR CODE HERE
+            if (fields.Length < 4)
+                continue; // skip invalid lines
+
+            string degree = fields[3].Trim(); // column 4 (0-based index 3)
+
+            if (degrees.ContainsKey(degree))
+                degrees[degree]++;      // increment count
+            else
+                degrees[degree] = 1;    // first occurrence
         }
 
         return degrees;
@@ -67,7 +112,34 @@ public static class SetsAndMaps
     public static bool IsAnagram(string word1, string word2)
     {
         // TODO Problem 3 - ADD YOUR CODE HERE
-        return false;
+        word1 = word1.Replace(" ", "").ToLower();
+        word2 = word2.Replace(" ", "").ToLower();
+
+        if (word1.Length != word2.Length)
+            return false;
+
+        var letterCounts = new Dictionary<char, int>();
+
+        foreach (char c in word1)
+        {
+            if (letterCounts.ContainsKey(c))
+                letterCounts[c]++;
+            else
+                letterCounts[c] = 1;
+        }
+
+        foreach (char c in word2)
+        {
+            if (!letterCounts.ContainsKey(c))
+                return false;
+
+            letterCounts[c]--;
+
+            if (letterCounts[c] < 0)
+                return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -101,6 +173,23 @@ public static class SetsAndMaps
         // on those classes so that the call to Deserialize above works properly.
         // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
         // 3. Return an array of these string descriptions.
-        return [];
-    }
-}
+
+        List<string> summary = new List<string>();
+
+        foreach (var feature in featureCollection.Features)
+        {
+            string place = feature.Properties.Place;
+            double? mag = feature.Properties.Mag;
+
+            // Skip if missing data
+            if (string.IsNullOrEmpty(place) || mag == null)
+                continue;
+
+            // Format with 2 decimal places
+            summary.Add($"{place} - Mag {mag:F2}");
+        }
+
+        return summary.ToArray();
+    }  // End of EarthquakeDailySummary
+
+}  // End of SetsAndMaps class
