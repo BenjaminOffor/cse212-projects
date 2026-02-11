@@ -1,9 +1,14 @@
+using System;
+
+/// <summary>
+/// Represents a person in the queue with a name and number of turns.
+/// </summary>
 public class Person
 {
-    public readonly string Name;
+    public string Name { get; }
     public int Turns { get; set; }
 
-    internal Person(string name, int turns)
+    public Person(string name, int turns)
     {
         Name = name;
         Turns = turns;
@@ -11,6 +16,6 @@ public class Person
 
     public override string ToString()
     {
-        return Turns <= 0 ? $"({Name}:Forever)" : $"({Name}:{Turns})";
+        return Name;
     }
 }
