@@ -108,13 +108,12 @@ public static class Recursion
  public static long CountWaysToClimb(int s, Dictionary<int,long>? remember = null)
 {
     if (remember == null) remember = new Dictionary<int,long>();
-
     if (s < 0) return 0;
     if (s == 0) return 1;
 
     if (remember.ContainsKey(s)) return remember[s];
 
-    long count =
+    long count = 
         CountWaysToClimb(s - 1, remember) +
         CountWaysToClimb(s - 2, remember) +
         CountWaysToClimb(s - 3, remember);
